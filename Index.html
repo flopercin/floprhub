@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система регистрации</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+            font-family: Arial, sans-serif;
+            color: #fff;
+        }
+        .container {
+            border: 2px solid #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 300px;
+            width: 100%;
+        }
+        input, button {
+            display: block;
+            margin: 10px auto;
+            padding: 5px;
+            width: 80%;
+        }
+        #message {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Регистрация</h2>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Пароль">
+        <button onclick="register()">Зарегистрироваться</button>
+        <button onclick="login()">Войти</button>
+        <button onclick="logout()" id="logout" style="display:none;">Выйти</button>
+        <p id="message"></p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCmv0bj3l2fDUQe6-xzlkpEu5r_Qdbpm7w",
+            authDomain: "floperin-559d7.firebaseapp.com",
+            projectId: "floperin-559d7",
+            storageBucket: "floperin-559d7.firebasestorage.app",
+            messagingSenderId: "313128941793",
+            appId: "1:313128941793:web:2a33815852477fa136dfa0",
+            measurementId: "G-LCZJLT5JJE"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('message').textContent = `Вы вошли как: ${user.email}`;
+                document.getElementById('logout').style.display = 'block';
+            } else {
+                document.getElementById('message').textContent = 'Вы не вошли';
+                document.getElementById('logout').style.display = 'none';
+            }
+        });
+
+        window.register = function() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (email && password) {
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then(() => {
+                        document.getElementById('message').textContent = 'Регистрация успешна!';
+                    })
+                    .catch((error) => {
+                        document.getElementById('message').textContent = `Ошибка: ${error.message}`;
+                    });
+            } else {
+                document.getElementById('message').textContent = 'Заполните все поля!';
+            }
+        };
+
+        window.login = function() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (email && password) {
+                signInWithEmailAndPassword(auth, email, password)
+                    .then(() => {
+                        document.getElementById('message').textContent = 'Вход выполнен!';
+                    })
+                    .catch((error) => {
+                        document.getElementById('message').textContent = `Ошибка: ${error.message}`;
+                    });
+            } else {
+                document.getElementById('message').textContent = 'Заполните все поля!';
+            }
+        };
+
+        window.logout = function() {
+            signOut(auth)
+                .then(() => {
+                    document.getElementById('message').textContent = 'Вы вышли!';
+                })
+                .catch((error) => {
+                    document.getElementById('message').textContent = `Ошибка: ${error.message}`;
+                });
+        };
+    </script>
+</body>
+</html>
